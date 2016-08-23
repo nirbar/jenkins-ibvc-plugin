@@ -1,7 +1,6 @@
 package jenkins.plugins.Ibvc;
 
 import hudson.AbortException;
-import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -13,22 +12,16 @@ import hudson.scm.SCMDescriptor;
 import hudson.scm.SCMRevisionState;
 import hudson.Proc;
 import hudson.Launcher.ProcStarter;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.InterruptedException;
-
 import net.sf.json.JSONObject;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import java.util.ArrayList;
 import java.util.Map;
-
 import hudson.model.AbstractBuild;
-import hudson.model.Build;
 import hudson.model.Result;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Collection;

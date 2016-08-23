@@ -1,7 +1,6 @@
 package jenkins.plugins.Ibvc;
 
 import java.io.File;
-
 import hudson.model.AbstractBuild;
 import hudson.model.Node;
 import hudson.model.Run;

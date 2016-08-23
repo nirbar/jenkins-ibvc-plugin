@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Collection;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
-
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;

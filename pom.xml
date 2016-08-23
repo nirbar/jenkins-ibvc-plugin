@@ -5,7 +5,7 @@
 
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>ibvc</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.3</version>
     <relativePath/>
   </parent>
@@ -15,24 +15,14 @@
   <packaging>hpi</packaging>
 
   <properties>
-    <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
     <jenkins.version>1.625.3</jenkins.version>
-    <!-- Java Level to use. Java 7 required when using core >= 1.612 -->
     <java.level>7</java.level>
-    <!-- Jenkins Test Harness version you use to test the plugin. -->
-    <!-- For Jenkins version >= 1.580.1 use JTH 2.x or higher. -->
     <jenkins-test-harness.version>2.1</jenkins-test-harness.version>
-    <!-- Other properties you may want to use:
-         ~ hpi-plugin.version: The HPI Maven Plugin version used by the plugin..
-         ~ stapler-plugin.version: The Stapler Maven plugin version required by the plugin.
-    -->
   </properties>
 
   <name>IBVC Plugin</name>
   <description>IBVC</description>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/IBVC+Plugin</url>
-
-  <!-- The default licence for Jenkins OSS Plugins is MIT. Substitute for the applicable one if needed. -->
 
   <licenses>
     <license>
@@ -41,22 +31,20 @@
     </license>
   </licenses>
 
-  <!-- If you want this to appear on the wiki page:
   <developers>
     <developer>
-      <id>bhacker</id>
-      <name>Bob Q. Hacker</name>
-      <email>bhacker@nowhere.net</email>
+      <id>panel_software</id>
+      <name>Panel::Software</name>
+      <email>nir.bar@panel-sw.co.il</email>
     </developer>
   </developers>
-  -->
-  <!-- Assuming you want to host on @jenkinsci:
+
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
     <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
   </scm>
-   -->
+
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
@@ -69,14 +57,5 @@
       <url>http://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
-  <!-- If you want to depend on other plugins:
-  <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>credentials</artifactId>
-      <version>1.9.4</version>
-    </dependency>
-  </dependencies>
-  -->
 
 </project>

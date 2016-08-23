@@ -5,7 +5,6 @@ import hudson.slaves.NodePropertyDescriptor;
 import hudson.model.Node;
 import hudson.Extension;
 import net.sf.json.JSONObject;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -49,7 +48,6 @@ public class IbvcNodeProperties extends NodeProperty<Node>{
         public boolean isApplicableAsGlobal(){
         	return false;
         }
-
  
         @Override
         public IbvcNodeProperties newInstance(StaplerRequest req, JSONObject formData) throws FormException {
