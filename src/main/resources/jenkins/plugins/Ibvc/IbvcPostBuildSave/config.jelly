@@ -1,0 +1,25 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+	<f:entry title="${%Keep Forever}" field="keep">
+		<f:checkbox />
+	</f:entry>
+	<f:entry title="${%Purge Others}" field="purgeOther">
+		<f:checkbox />
+	</f:entry>
+	<f:entry title="${%Addiotinal Arguments}" field="addiotinalArguments">
+		<f:textbox />
+	</f:entry>
+	
+	<f:block>
+		<f:optionalBlock field="overrideIbvcScmConfig" title="${%Override IBVC SCM Configurations}" inline="true">
+			<f:entry title="${%IBVC.config file}" field="ibvcConfig">
+				<f:textbox />
+			</f:entry>
+			<f:entry title="${%Parameters}" field="parameters">
+			   <f:repeatableProperty field="parameters" />
+			</f:entry>
+		</f:optionalBlock>
+	</f:block>
+	
+</j:jelly>
