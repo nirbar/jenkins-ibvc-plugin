@@ -15,17 +15,13 @@ Adds an IBVC SCM provider and a post build step to commit intermediate and binar
 
 #### Rampup
 
-  -# [Plugin Tutorial](https://wiki.jenkins-ci.org/display/JENKINS/Plugin+tutorial)
+  - [Plugin Tutorial](https://wiki.jenkins-ci.org/display/JENKINS/Plugin+tutorial)
   
 #### Build and Test
   
   - Build
-  ~~~~
-  mvn install
-  ~~~~
+    mvn install
   - Test
-  ~~~~
-  mvn hpi:run
-  ~~~~
-    - [Browse](http://localhost:8080/jenkins)
+    mvn hpi:run
+  - [Browse](http://localhost:8080/jenkins)
   
