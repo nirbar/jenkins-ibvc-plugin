@@ -20,8 +20,8 @@ Adds an IBVC SCM provider and a post build step to commit intermediate and binar
 #### Build and Test
   
   - Build
-    mvn install
+      mvn install
   - Test
-    mvn hpi:run
+      mvn hpi:run
   - [Browse](http://localhost:8080/jenkins)
   
