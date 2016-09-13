@@ -30,6 +30,7 @@ import hudson.tasks.BuildWrapperDescriptor;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+import org.jenkinsci.Symbol;
 
 /**
  * @author Build
@@ -242,6 +243,7 @@ public class IbvcBuildWrapper extends BuildWrapper {
     }
 
     @Extension
+    @Symbol("ibvc_pre_scm")
     public static final class DescriptorImpl extends BuildWrapperDescriptor {
         public DescriptorImpl() {
 			super(IbvcBuildWrapper.class);

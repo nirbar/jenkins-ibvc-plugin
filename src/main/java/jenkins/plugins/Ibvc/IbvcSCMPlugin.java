@@ -25,6 +25,7 @@ import hudson.model.Result;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Collection;
+import org.jenkinsci.Symbol;
 
 public class IbvcSCMPlugin extends SCM {
 
@@ -216,6 +217,7 @@ public class IbvcSCMPlugin extends SCM {
     }
 
     @Extension
+    @Symbol("ibvc")
     public static final class DescriptorImpl extends SCMDescriptor<IbvcSCMPlugin> {
         public DescriptorImpl() {
 			super(IbvcSCMPlugin.class, null);

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Collection;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 import hudson.AbortException;
 import hudson.EnvVars;
@@ -22,73 +23,67 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 
 public class IbvcPostBuildSave extends Recorder {
 
-    private final String ibvcConfig_;
-    private final boolean purgeOther_;
-    private final boolean keep_;
-    private final String addiotinalArguments_;
-    private final Collection<IbvcParameter> parameters_;
-	private final boolean overrideIbvcScmConfig_;
-
-    @DataBoundConstructor
-    public IbvcPostBuildSave(
-        String ibvcConfig
-		, boolean keep
-		, boolean purgeOther
-		, String addiotinalArguments
-		, Collection<IbvcParameter> parameters
-		, boolean overrideIbvcScmConfig
-		)
-    {		
-		// Override IBVC SCM defaults?
-		overrideIbvcScmConfig_ = overrideIbvcScmConfig;		
-		if(overrideIbvcScmConfig_){
-			if((ibvcConfig != null) && (ibvcConfig.length() > 0)){
-				File file1 = new File(ibvcConfig);
-				ibvcConfig = file1.getPath();
-				ibvcConfig_ = ibvcConfig;
-			}
-			else{
-				ibvcConfig_ = null;				
-			}
-			
-			if((parameters != null) && (parameters.size() > 0)){
-				parameters_ = parameters;
-			}
-			else{
-				parameters_ = null;
-			}
-		}
-		else{
-			ibvcConfig_ = null;
-			parameters_ = null;
-		}
-
-		
-		purgeOther_ = purgeOther;
-		keep_ = keep;
-		addiotinalArguments_ = addiotinalArguments;
-    }
+    private String ibvcConfig_;
+    private boolean purgeOther_;
+    private boolean keep_;
+    private String addiotinalArguments_;
+    private Collection<IbvcParameter> parameters_;
+	private boolean overrideIbvcScmConfig_;
 	
 	public String getIbvcConfig(){
 		return ibvcConfig_;
+	}	
+	@DataBoundSetter
+	public void setIbvcConfig(String ibvcConfig){
+		File file1 = new File(ibvcConfig);
+		ibvcConfig = file1.getPath();
+		ibvcConfig_ = ibvcConfig;
 	}
+	
 	public boolean isPurgeOther(){
 		return purgeOther_;
 	}
+	@DataBoundSetter
+	public void setPurgeOther(boolean purgeOther){
+		purgeOther_ = purgeOther;
+	}
+	
 	public boolean isKeep(){
 		return keep_;
 	}
+	@DataBoundSetter
+	public void setKeep(boolean keep){
+		keep_ = keep;
+	}
+	
 	public String getAddiotinalArguments(){
 		return addiotinalArguments_;
 	}
+	@DataBoundSetter
+	public void setAddiotinalArguments(String args){
+		addiotinalArguments_ = args;
+	}
+
 	public Collection<IbvcParameter> getParameters(){
 		return parameters_;
 	}
+	@DataBoundSetter
+	public void setParameters(Collection<IbvcParameter> args){
+		if (overrideIbvcScmConfig_){
+			parameters_ = args;
+		}
+	}
+
 	public boolean isOverrideIbvcScmConfig(){
 		return overrideIbvcScmConfig_;
+	}
+	@DataBoundSetter
+	public void setOverrideIbvcScmConfig(boolean overrideIbvcScmConfig){
+		overrideIbvcScmConfig_ = overrideIbvcScmConfig;
 	}
 
 	@Override
@@ -113,7 +108,7 @@ public class IbvcPostBuildSave extends Recorder {
 		args.add("checkin");
 		
 		String ibvcConfig = ibvcConfig_;
-		if((ibvcConfig == null) || (ibvcConfig.length() == 0)){			
+		if(!overrideIbvcScmConfig_ || (ibvcConfig == null) || (ibvcConfig.length() == 0)){			
 			EnvVars vars = build.getEnvironment(listener);
 			if((vars != null) && vars.containsKey("IBVC_CONFIG")){
 				ibvcConfig = vars.get("IBVC_CONFIG");
@@ -124,7 +119,7 @@ public class IbvcPostBuildSave extends Recorder {
 			args.add(ibvcConfig);
 		} 		
 		
-		if( ibvcLic.length() > 0){
+		if(ibvcLic.length() > 0){
 			args.add("--lic-file");
 			args.add(ibvcLic);
 		}
@@ -141,7 +136,7 @@ public class IbvcPostBuildSave extends Recorder {
 			args.add(addiotinalArguments_);
 		}
 		
-		if((parameters_ == null) || (parameters_.size() == 0)){
+		if(!overrideIbvcScmConfig_ || (parameters_ == null) || (parameters_.size() == 0)){
 			EnvVars vars = build.getEnvironment(listener);
 			if(vars != null){
 				for (Entry<String, String> kv : vars.entrySet()){
@@ -200,6 +195,7 @@ public class IbvcPostBuildSave extends Recorder {
         return (DescriptorImpl) super.getDescriptor();
     }
     @Extension
+    @Symbol("ibvc_checkin")
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         public DescriptorImpl() {
 			super(IbvcPostBuildSave.class);
