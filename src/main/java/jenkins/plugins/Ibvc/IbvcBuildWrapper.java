@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import hudson.AbortException;
@@ -223,9 +224,9 @@ public class IbvcBuildWrapper extends BuildWrapper {
 		
 		@Override
 		public void buildEnvVars(Map<String,String> env){
-			for(String k : envVars_.keySet()){
-				if (!env.containsKey(k)){
-					env.put(k, envVars_.get(k));
+			for(Entry<String, String> k : envVars_.entrySet()){
+				if (!env.containsKey(k.getKey())){
+					env.put(k.getKey(), k.getValue());
 				}
 			}
 		}
