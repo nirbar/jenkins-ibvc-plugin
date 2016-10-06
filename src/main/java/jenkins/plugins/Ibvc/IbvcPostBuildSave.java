@@ -99,10 +99,11 @@ public class IbvcPostBuildSave extends Recorder {
 	        listener.getLogger().println( Messages.Skipping_IBVC_Save_on_failure());
 			return true;
 		}
-      
+	    final EnvVars vars = build.getEnvironment(listener);
+    	
     	// Detect home, license file from node properties
-		String ibvcPath = Util.nodeIbvcPath(build);
-		String ibvcLic = Util.nodeLicensePath(build);
+		String ibvcPath = vars.expand(Util.nodeIbvcPath(build));
+		String ibvcLic = vars.expand(Util.nodeLicensePath(build));
 
 		ArrayList<String> args = new ArrayList<String>();
         ProcStarter ps = launcher.new ProcStarter();
@@ -114,9 +115,8 @@ public class IbvcPostBuildSave extends Recorder {
 		
 		String ibvcConfig = ibvcConfig_;
 		if((ibvcConfig == null) || (ibvcConfig.length() == 0)){			
-			EnvVars vars = build.getEnvironment(listener);
 			if((vars != null) && vars.containsKey("IBVC_CONFIG")){
-				ibvcConfig = vars.get("IBVC_CONFIG");
+				ibvcConfig = vars.expand(vars.get("IBVC_CONFIG"));
 			}
 		}
 		if((ibvcConfig != null) && (ibvcConfig.length() > 0)){
@@ -138,26 +138,23 @@ public class IbvcPostBuildSave extends Recorder {
 		}
 			
 		if( addiotinalArguments_.length() > 0){
-			args.add(addiotinalArguments_);
+			args.add(vars.expand(addiotinalArguments_));
 		}
 		
 		if((parameters_ == null) || (parameters_.size() == 0)){
-			EnvVars vars = build.getEnvironment(listener);
-			if(vars != null){
-				for (Entry<String, String> kv : vars.entrySet()){
-				    if(kv.getKey().startsWith("IBVC_PARAM_")){
-				    	String k = kv.getKey().substring("IBVC_PARAM_".length());
-						args.add( "--param-" + k);
-						args.add( kv.getValue());
-				    }
-				}
+			for (Entry<String, String> kv : vars.entrySet()){
+			    if(kv.getKey().startsWith("IBVC_PARAM_")){
+			    	String k = kv.getKey().substring("IBVC_PARAM_".length());
+					args.add("--param-" + vars.expand(k));
+					args.add(vars.expand(kv.getValue()));
+			    }
 			}
 		}
 		else{
 			for( IbvcParameter p : parameters_){
 				if(p.getName().length() > 0){
-					args.add( "--param-" + p.getName());
-					args.add( p.getValue());
+					args.add( "--param-" + vars.expand(p.getName()));
+					args.add( vars.expand(p.getValue()));
 				}
 			}
 		}
