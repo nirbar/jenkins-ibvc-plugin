@@ -22,6 +22,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.util.ArrayList;
 import java.util.Map;
 import hudson.model.AbstractBuild;
+import hudson.model.Queue;
 import hudson.model.Result;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -125,7 +126,12 @@ public class IbvcSCMPlugin extends SCM {
         File changelogFile,
         SCMRevisionState baseline
 		) throws IOException, InterruptedException
-    {
+    {    	
+	    if (build.getParent() instanceof Queue.FlyweightTask){
+	        listener.getLogger().println( Messages.Skipping_FlyweightTask());
+	        return;
+	    }
+
 	    final EnvVars vars = build.getEnvironment(listener);
     	
     	// Detect home, license file from node properties

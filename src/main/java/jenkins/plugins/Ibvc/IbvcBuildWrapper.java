@@ -24,6 +24,7 @@ import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Queue;
 import hudson.scm.SCM;
 import hudson.scm.SCMDescriptor;
 import hudson.tasks.BuildWrapper;
@@ -114,9 +115,14 @@ public class IbvcBuildWrapper extends BuildWrapper {
             BuildListener listener)
      throws IOException,
             InterruptedException
-    {
+    {    	
+	    if (build.getProject() instanceof Queue.FlyweightTask){
+	        listener.getLogger().println( Messages.Skipping_FlyweightTask());
+	        return;
+	    }
+
 	    final EnvVars vars = build.getEnvironment(listener);
-    	
+	    
     	// Detect home, license file from node properties
 		String ibvcPath = vars.expand(Util.nodeIbvcPath(build));
 		listener.getLogger().println(String.format("%s: '%s'",Messages.IBVC_PATH(), ibvcPath));

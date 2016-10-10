@@ -16,6 +16,7 @@ import hudson.Proc;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -94,6 +95,11 @@ public class IbvcPostBuildSave extends Recorder {
 	@Override
 	public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener)
               throws InterruptedException, IOException{
+    	
+	    if (build.getProject() instanceof Queue.FlyweightTask){
+	        listener.getLogger().println( Messages.Skipping_FlyweightTask());
+			return true;
+	    }
 		
 		if(build.getResult() != Result.SUCCESS){
 	        listener.getLogger().println( Messages.Skipping_IBVC_Save_on_failure());
