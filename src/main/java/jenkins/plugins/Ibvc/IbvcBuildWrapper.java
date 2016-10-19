@@ -24,6 +24,7 @@ import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Queue;
 import hudson.scm.SCM;
 import hudson.scm.SCMDescriptor;
 import hudson.tasks.BuildWrapper;
@@ -114,15 +115,21 @@ public class IbvcBuildWrapper extends BuildWrapper {
             BuildListener listener)
      throws IOException,
             InterruptedException
-    {
-    	
+    {    	
+	    if (build.getProject() instanceof Queue.FlyweightTask){
+	        listener.getLogger().println( Messages.Skipping_FlyweightTask());
+	        return;
+	    }
+
+	    final EnvVars vars = build.getEnvironment(listener);
+	    
     	// Detect home, license file from node properties
-		String ibvcPath = Util.nodeIbvcPath(build);
+		String ibvcPath = vars.expand(Util.nodeIbvcPath(build));
 		listener.getLogger().println(String.format("%s: '%s'",Messages.IBVC_PATH(), ibvcPath));
 
-		String ibvcLic = Util.nodeLicensePath(build);
+		String ibvcLic = vars.expand(Util.nodeLicensePath(build));
 	    listener.getLogger().println(String.format("%s: '%s'", Messages.IBVC_LICENSE(), ibvcLic));
-
+	    
 		ArrayList<String> args = new ArrayList<String>();
         ProcStarter ps = launcher.new ProcStarter();
         
@@ -133,27 +140,27 @@ public class IbvcBuildWrapper extends BuildWrapper {
 		
 		if(ibvcConfig_.length() > 0){
 		    args.add("--ibvc-config");
-			args.add(ibvcConfig_);
+			args.add(vars.expand(ibvcConfig_));
 		}
 		
 		if( ibvcLic.length() > 0){
 			args.add("--lic-file");
-			args.add(ibvcLic);
+			args.add(vars.expand(ibvcLic));
 		}
 			
 		if( sfvcRevision_.length() > 0){
 			args.add("--sfvc-revision");
-			args.add(sfvcRevision_);
+			args.add(vars.expand(sfvcRevision_));
 		}
 		
 		if( addiotinalArguments_.length() > 0){
-			args.add(addiotinalArguments_);
+			args.add(vars.expand(addiotinalArguments_));
 		}
 
 		if( parameters_ != null){
 			for( IbvcParameter p : parameters_){
-				args.add( "--param-" + p.getName());
-				args.add( p.getValue());
+				args.add("--param-" + vars.expand( p.getName()));
+				args.add(vars.expand(p.getValue()));
 			}
 		}
 

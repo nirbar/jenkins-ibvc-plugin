@@ -1,6 +1,7 @@
 package jenkins.plugins.Ibvc;
 
 import hudson.AbortException;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -21,6 +22,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import java.util.ArrayList;
 import java.util.Map;
 import hudson.model.AbstractBuild;
+import hudson.model.Queue;
 import hudson.model.Result;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,8 +81,7 @@ public class IbvcSCMPlugin extends SCM {
 	 *
 	 */
 	@Override
-	public void buildEnvVars(AbstractBuild<?,?> build,
-            Map<String,String> env){
+	public void buildEnvVars(AbstractBuild<?,?> build, Map<String,String> env){
     	
     	if(!env.containsKey("IBVC_CONFIG")){
     		env.put("IBVC_CONFIG", ibvcConfig_);
@@ -125,14 +126,17 @@ public class IbvcSCMPlugin extends SCM {
         File changelogFile,
         SCMRevisionState baseline
 		) throws IOException, InterruptedException
-    {
+    {    	
+	    if (build.getParent() instanceof Queue.FlyweightTask){
+	        listener.getLogger().println( Messages.Skipping_FlyweightTask());
+	        return;
+	    }
+
+	    final EnvVars vars = build.getEnvironment(listener);
     	
     	// Detect home, license file from node properties
-		String ibvcPath = Util.nodeIbvcPath(build);
-		listener.getLogger().println(String.format("%s: '%s'",Messages.IBVC_PATH(), ibvcPath));
-
-		String ibvcLic = Util.nodeLicensePath(build);
-	    listener.getLogger().println(String.format("%s: '%s'", Messages.IBVC_LICENSE(), ibvcLic));
+		String ibvcPath = vars.expand(Util.nodeIbvcPath(build));
+		String ibvcLic = vars.expand(Util.nodeLicensePath(build));
 
 		ArrayList<String> args = new ArrayList<String>();
         ProcStarter ps = launcher.new ProcStarter();
@@ -142,27 +146,27 @@ public class IbvcSCMPlugin extends SCM {
 		
 		if(ibvcConfig_.length() > 0){
 		    args.add("--ibvc-config");
-			args.add(ibvcConfig_);
+			args.add(vars.expand(ibvcConfig_));
 		}
 		
 		if( ibvcLic.length() > 0){
 			args.add("--lic-file");
-			args.add(ibvcLic);
+			args.add(vars.expand(ibvcLic));
 		}
 			
 		if( sfvcRevision_.length() > 0){
 			args.add("--sfvc-revision");
-			args.add(sfvcRevision_);
+			args.add(vars.expand(sfvcRevision_));
 		}
 		
 		if( addiotinalArguments_.length() > 0){
-			args.add(addiotinalArguments_);
+			args.add(vars.expand(addiotinalArguments_));
 		}
 
 		if( parameters_ != null){
 			for( IbvcParameter p : parameters_){
-				args.add( "--param-" + p.getName());
-				args.add( p.getValue());
+				args.add( "--param-" + vars.expand(p.getName()));
+				args.add( vars.expand(p.getValue()));
 			}
 		}
 
