@@ -27,6 +27,7 @@ import net.sf.json.JSONObject;
 public class IbvcPostBuildSave extends Recorder {
 
     private final String ibvcConfig_;
+    private final boolean runAsync_;
     private final boolean purgeOther_;
     private final boolean keep_;
     private final String addiotinalArguments_;
@@ -36,6 +37,7 @@ public class IbvcPostBuildSave extends Recorder {
     @DataBoundConstructor
     public IbvcPostBuildSave(
         String ibvcConfig
+        , boolean runAsync
 		, boolean keep
 		, boolean purgeOther
 		, String addiotinalArguments
@@ -67,7 +69,7 @@ public class IbvcPostBuildSave extends Recorder {
 			parameters_ = null;
 		}
 
-		
+		runAsync_ = runAsync;
 		purgeOther_ = purgeOther;
 		keep_ = keep;
 		addiotinalArguments_ = addiotinalArguments;
@@ -75,6 +77,9 @@ public class IbvcPostBuildSave extends Recorder {
 	
 	public String getIbvcConfig(){
 		return ibvcConfig_;
+	}
+	public boolean isRunAsync(){
+		return runAsync_;
 	}
 	public boolean isPurgeOther(){
 		return purgeOther_;
@@ -101,7 +106,7 @@ public class IbvcPostBuildSave extends Recorder {
 			return true;
 	    }
 		
-		if(build.getResult() != Result.SUCCESS){
+		if (build.getResult() != Result.SUCCESS){
 	        listener.getLogger().println( Messages.Skipping_IBVC_Save_on_failure());
 			return true;
 		}
@@ -120,17 +125,17 @@ public class IbvcPostBuildSave extends Recorder {
 		args.add("checkin");
 		
 		String ibvcConfig = ibvcConfig_;
-		if((ibvcConfig == null) || (ibvcConfig.length() == 0)){			
-			if((vars != null) && vars.containsKey("IBVC_CONFIG")){
+		if ((ibvcConfig == null) || (ibvcConfig.length() == 0)){			
+			if ((vars != null) && vars.containsKey("IBVC_CONFIG")){
 				ibvcConfig = vars.expand(vars.get("IBVC_CONFIG"));
 			}
 		}
-		if((ibvcConfig != null) && (ibvcConfig.length() > 0)){
+		if ((ibvcConfig != null) && (ibvcConfig.length() > 0)){
 		    args.add("--ibvc-config");
 			args.add(ibvcConfig);
 		} 		
 		
-		if( ibvcLic.length() > 0){
+		if (ibvcLic.length() > 0){
 			args.add("--lic-file");
 			args.add(ibvcLic);
 		}
@@ -143,13 +148,13 @@ public class IbvcPostBuildSave extends Recorder {
 			args.add("--purge-other");
 		}
 			
-		if( addiotinalArguments_.length() > 0){
+		if (addiotinalArguments_.length() > 0){
 			args.add(vars.expand(addiotinalArguments_));
 		}
 		
-		if((parameters_ == null) || (parameters_.size() == 0)){
+		if ((parameters_ == null) || (parameters_.size() == 0)){
 			for (Entry<String, String> kv : vars.entrySet()){
-			    if(kv.getKey().startsWith("IBVC_PARAM_")){
+			    if (kv.getKey().startsWith("IBVC_PARAM_")){
 			    	String k = kv.getKey().substring("IBVC_PARAM_".length());
 					args.add("--param-" + vars.expand(k));
 					args.add(vars.expand(kv.getValue()));
@@ -157,8 +162,8 @@ public class IbvcPostBuildSave extends Recorder {
 			}
 		}
 		else{
-			for( IbvcParameter p : parameters_){
-				if(p.getName().length() > 0){
+			for (IbvcParameter p : parameters_){
+				if (p.getName().length() > 0){
 					args.add( "--param-" + vars.expand(p.getName()));
 					args.add( vars.expand(p.getValue()));
 				}
@@ -166,18 +171,25 @@ public class IbvcPostBuildSave extends Recorder {
 		}
 
         ps.cmds(args);
-        ps.stderr(listener.getLogger());
-        ps.stdout(listener.getLogger());
+        if (!runAsync_){
+	        ps.stderr(listener.getLogger());
+	        ps.stdout(listener.getLogger());
+        }
         
         try {
-        	Proc ibPrc = launcher.launch(ps);        	
+        	Proc ibPrc = launcher.launch(ps);
+        	if (runAsync_){
+    	        listener.getLogger().println(Messages.IBVC_return_immediately());
+    		    return true;
+        	}
+        	
         	int ibExitCode = ibPrc.join();
 
         	// Analyze exit code.
-        	switch( ibExitCode){
+        	switch (ibExitCode){
         	case 0:
-    	        listener.getLogger().println( Messages.IBVC_finished_successfully());
-    	        break;
+    	        listener.getLogger().println(Messages.IBVC_finished_successfully());
+    		    return true;
     	        
 			default:
 				build.setResult(Result.FAILURE);
@@ -185,13 +197,12 @@ public class IbvcPostBuildSave extends Recorder {
         	}
 
 		} catch (IOException e) {
-	        listener.getLogger().println( e.getMessage());
+	        listener.getLogger().println(e.getMessage());
 			throw e;
 		} catch (InterruptedException e) {
-	        listener.getLogger().println( String.format( "%s: %s", Messages.IBVC_failed_to_finish_properly(), e.getMessage()));
+	        listener.getLogger().println(String.format( "%s: %s", Messages.IBVC_failed_to_finish_properly(), e.getMessage()));
 			throw e;
 		}
-	    return true;
      }
 	
 	public BuildStepMonitor getRequiredMonitorService() {
