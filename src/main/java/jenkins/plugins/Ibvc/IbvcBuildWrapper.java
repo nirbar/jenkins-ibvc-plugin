@@ -43,6 +43,7 @@ public class IbvcBuildWrapper extends BuildWrapper {
     private final String sfvcRevision_;
     private final String addiotinalArguments_;
     private final Collection<IbvcParameter> parameters_;
+    private final boolean ibvcCleanCheckout_;
     
     private String bestMatchSfvcRev_ = null;
     private String bestMatchIbvcRev_ = null;
@@ -51,6 +52,7 @@ public class IbvcBuildWrapper extends BuildWrapper {
     public IbvcBuildWrapper(
         String ibvcConfig
 		, String sfvcRevision
+		, boolean ibvcCleanCheckout
 		, String addiotinalArguments
 		, Collection<IbvcParameter> parameters
 		) {
@@ -61,6 +63,7 @@ public class IbvcBuildWrapper extends BuildWrapper {
 
 	    ibvcConfig_ = ibvcConfig;
 		sfvcRevision_ = sfvcRevision;
+		ibvcCleanCheckout_ = ibvcCleanCheckout;
 		addiotinalArguments_ = addiotinalArguments;
 		parameters_ = parameters;
     }
@@ -153,6 +156,10 @@ public class IbvcBuildWrapper extends BuildWrapper {
 			args.add(vars.expand(sfvcRevision_));
 		}
 		
+		if (ibvcCleanCheckout_){
+			args.add("--ibvc-clean-checkout");
+		}			
+		
 		if( addiotinalArguments_.length() > 0){
 			args.add(vars.expand(addiotinalArguments_));
 		}
@@ -213,6 +220,9 @@ public class IbvcBuildWrapper extends BuildWrapper {
 	}
 	public String getSfvcRevision(){
 		return sfvcRevision_;
+	}
+	public boolean isIbvcCleanCheckout(){
+		return ibvcCleanCheckout_;
 	}
 	public String getAddiotinalArguments(){
 		return addiotinalArguments_;
