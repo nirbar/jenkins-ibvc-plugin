@@ -7,6 +7,9 @@
 	<f:entry title="${%SFVC Revision}" field="sfvcRevision">
 		<f:textbox />
 	</f:entry>
+	<f:entry title="${%IBVC Clean Checkout}" field="ibvcCleanCheckout">
+		<f:checkbox />
+	</f:entry>
 	<f:entry title="${%Addiotinal Arguments}" field="addiotinalArguments">
 		<f:textbox />
 	</f:entry>

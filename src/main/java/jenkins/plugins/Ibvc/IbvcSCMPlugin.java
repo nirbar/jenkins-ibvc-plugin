@@ -34,6 +34,7 @@ public class IbvcSCMPlugin extends SCM {
     private final String sfvcRevision_;
     private final String addiotinalArguments_;
     private final Collection<IbvcParameter> parameters_;
+    private final boolean ibvcCleanCheckout_;
     
     private String bestMatchSfvcRev_ = null;
     private String bestMatchIbvcRev_ = null;
@@ -42,6 +43,7 @@ public class IbvcSCMPlugin extends SCM {
     public IbvcSCMPlugin(
         String ibvcConfig
 		, String sfvcRevision
+		, boolean ibvcCleanCheckout
 		, String addiotinalArguments
 		, Collection<IbvcParameter> parameters
 		)
@@ -53,6 +55,7 @@ public class IbvcSCMPlugin extends SCM {
 
 	    ibvcConfig_ = ibvcConfig;
 		sfvcRevision_ = sfvcRevision;
+		ibvcCleanCheckout_ = ibvcCleanCheckout;
 		addiotinalArguments_ = addiotinalArguments;
 		parameters_ = parameters;
     }
@@ -62,6 +65,9 @@ public class IbvcSCMPlugin extends SCM {
 	}
 	public String getSfvcRevision(){
 		return sfvcRevision_;
+	}
+	public boolean isIbvcCleanCheckout(){
+		return ibvcCleanCheckout_;
 	}
 	public String getAddiotinalArguments(){
 		return addiotinalArguments_;
@@ -158,6 +164,10 @@ public class IbvcSCMPlugin extends SCM {
 			args.add("--sfvc-revision");
 			args.add(vars.expand(sfvcRevision_));
 		}
+		
+		if (ibvcCleanCheckout_){
+			args.add("--ibvc-clean-checkout");
+		}			
 		
 		if( addiotinalArguments_.length() > 0){
 			args.add(vars.expand(addiotinalArguments_));
